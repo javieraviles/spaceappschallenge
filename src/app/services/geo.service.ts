@@ -1,10 +1,9 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import * as geofirex from 'geofirex';
-import {GeoFireClient, GeoFirePoint, GeoQueryDocument} from 'geofirex';
+import { GeoFireClient, GeoFirePoint, GeoQueryDocument } from 'geofirex';
 import * as firebase from 'firebase/app';
-import {Coords} from '../models/coords';
-import {Alert} from "../models/Alert";
+import { Coords } from '../models/coords';
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +19,7 @@ export class GeoService {
     pushAlert() {
         const alerts = this.geo.collection('alerts');
         const point = this.geo.point(40, -119);
-        alerts.add({ coords: point.data, radius: 0, type: AlertType.SINGLE});
+        alerts.add({ coords: point.data, radius: 0, type: 'SINGLE' });
     }
 
     getAlerts(coords: Coords, radius: number): Observable<GeoQueryDocument[]> {

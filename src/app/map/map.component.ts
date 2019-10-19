@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {Coords} from '../models/coords';
-import {Geolocation} from '@ionic-native/geolocation/ngx';
-import {GeoService} from '../services/geo.service';
-import {Subscription} from 'rxjs';
-import {Alert} from '../models/Alert';
+import { Component, OnInit } from '@angular/core';
+import { Coords } from '../models/coords';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { GeoService } from '../services/geo.service';
+import { AuthService } from '../services/authentication.service';
+import { UserService } from '../services/user.service';
+import { Subscription } from 'rxjs';
+import { Alert, User } from '../models';
 
 @Component({
     selector: 'app-map',
@@ -14,28 +16,37 @@ export class MapComponent implements OnInit {
 
     radiusAlert = 100;
     updateDistance = 2;
-
-    userCoords: Coords = {longitude: null, latitude: null};
+    userCoords: Coords = { longitude: null, latitude: null };
     lastSearchCoords: Coords = null;
-
     alertsSubscription: Subscription = null;
     singleAlerts: Alert[] = [];
     areaAlerts: Alert[] = [];
+    user: User;
 
-
-    constructor(private geolocation: Geolocation, private geo: GeoService) {
+    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService, private authService: AuthService) {
     }
 
-    ngOnInit() {
+    async ngOnInit() {
+        this.user = await this.authService.getLoggedInUser();
         this.getUserLocation();
     }
 
     private getUserLocation() {
         const watch = this.geolocation.watchPosition();
         watch.subscribe((data) => {
-            this.userCoords = {latitude: data.coords.latitude, longitude: data.coords.longitude};
+            this.userCoords = { latitude: data.coords.latitude, longitude: data.coords.longitude };
             this.subscribeToAlerts();
+            this.updateCoords(this.userCoords);
         });
+    }
+
+    updateCoords(coords: Coords) {
+        this.userService.updateCoords(this.user.uid, coords);
+        console.log('coords updated');
+    }
+
+    createAlert() {
+        this.geo.pushAlert();
     }
 
     private subscribeToAlerts() {

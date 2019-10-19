@@ -6,8 +6,8 @@ import { RouterModule } from '@angular/router';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 import { HomePage } from './home.page';
-import {MapComponent} from "../map/map.component";
-import {AgmCoreModule} from "@agm/core";
+import { MapComponent } from '../map/map.component';
+import { AgmCoreModule } from '@agm/core';
 
 @NgModule({
   imports: [
@@ -27,4 +27,4 @@ import {AgmCoreModule} from "@agm/core";
   ],
   declarations: [HomePage, MapComponent]
 })
-export class HomePageModule {}
+export class HomePageModule { }
