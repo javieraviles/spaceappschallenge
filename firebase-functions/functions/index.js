@@ -11,20 +11,22 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onWrite((ch
     //Get created object
     alertsCollection.doc(context.params.alertId).get().then(newAlert => {
         //Calculate distances
-        console.log(newAlert);
         var newAlertCoords = newAlert._fieldsProto.coords.mapValue.fields.geopoint.geoPointValue;
-        console.log('newAlertCoords => ' + Object.keys(newAlertCoords));
         usersCollection.get().then(result => {
             result.forEach(user => {
                 var userCoords = user.data().coords.geopoint;
                 var distance = calculateDistance(newAlertCoords, userCoords);
-                console.log('distance: ' + distance);
+                console.log("user " + user.data().displayName + " distance: " + distance);
+                if(distance < 1){
+                    var notification = "There was an alert created at " + distance.toFixed(2) + "km from your current postion";
+                    usersCollection.doc(user.data().uid).update({notification : notification});
+                }
             });
-            return "";
+            return;
         }).catch(err => {
             console.log('Error getting documents', err);
         });
-        return "";
+        return;
     }).catch(err => {
         console.log('Error getting newAlert ', err);
     })
