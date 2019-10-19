@@ -1,12 +1,13 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {Coords} from '../models/coords';
-import {Geolocation} from '@ionic-native/geolocation/ngx';
-import {GeoService} from '../services/geo.service';
-import {AuthService} from '../services/authentication.service';
-import {UserService} from '../services/user.service';
-import {Subscription} from 'rxjs';
-import {Alert, User} from '../models';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Coords } from '../models/coords';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { GeoService } from '../services/geo.service';
+import { AuthService } from '../services/authentication.service';
+import { UserService } from '../services/user.service';
+import { Subscription } from 'rxjs';
+import { Alert, User } from '../models';
 import { AlertController } from '@ionic/angular';
+import { LatLngLiteral } from "@agm/core";
 
 @Component({
     selector: 'app-map',
@@ -15,19 +16,22 @@ import { AlertController } from '@ionic/angular';
 })
 export class MapComponent implements OnInit {
 
-    @Output() refreshCoords: EventEmitter<Coords> = new EventEmitter();
-
     radiusAlert = 100;
     updateDistance = 2;
+    mapPosition: Coords = { longitude: null, latitude: null };
     userCoords: Coords = { longitude: null, latitude: null };
     lastSearchCoords: Coords = null;
     alertsSubscription: Subscription = null;
     singleAlerts: Alert[] = [];
     areaAlerts: Alert[] = [];
     user: User;
+    selectedAreaRadius = 0;
+    isEditArea = false;
+    selfAlertId = null;
 
-    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService, private authService: AuthService, private alertController: AlertController) { }
-
+    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService,
+        private authService: AuthService, private alertController: AlertController) {
+    }
 
     async ngOnInit() {
 
@@ -50,7 +54,7 @@ export class MapComponent implements OnInit {
                 cssClass: 'secondary',
                 handler: (blah) => {
                     this.userService.removeNotification(this.user.uid);
-                    this.geo.pushAlert();
+                    this.geo.pushSingleAlert(null, this.userCoords, this.user.uid);
                 }
             }, {
                 text: 'YES',
@@ -62,13 +66,38 @@ export class MapComponent implements OnInit {
         await alert.present();
     }
 
+    onCenterChange(event: LatLngLiteral) {
+        this.mapPosition = { latitude: event.lat, longitude: event.lng };
+    }
+
+    onChangeArea(event: any) {
+        this.selectedAreaRadius = +event.detail.value;
+    }
+
+    sendAreaAlert() {
+        this.isEditArea = false;
+        this.geo.pushAreaAlert(this.mapPosition, this.selectedAreaRadius, this.user.uid);
+    }
+
+    clickAlert() {
+        this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid);
+    }
+
+    editAreaAlert() {
+        this.isEditArea = true;
+    }
+
     private getUserLocation() {
         const watch = this.geolocation.watchPosition();
         watch.subscribe((data) => {
             this.userCoords = { latitude: data.coords.latitude, longitude: data.coords.longitude };
             this.subscribeToAlerts();
             this.updateCoords(this.userCoords);
-            this.refreshCoords.emit(this.userCoords);
+            if (this.selfAlertId) {
+                this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid).then((value) => {
+                    this.selfAlertId = value;
+                });
+            }
         });
     }
 

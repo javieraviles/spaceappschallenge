@@ -6,11 +6,9 @@
         <ion-title>
             Map
         </ion-title>
-        <button (click)="clickAlert()">push alert testing</button>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <ion-button (click)="clickAlert()" style="position: absolute; z-index: 100;">Send Alert</ion-button>
     <app-map (refreshCoords)="updateCoords($event)"></app-map>
 </ion-content>

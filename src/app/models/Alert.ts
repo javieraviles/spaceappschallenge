@@ -3,4 +3,5 @@ export interface Alert {
     coords: any;
     type: string;
     radius: number;
+    userId: string;
 }

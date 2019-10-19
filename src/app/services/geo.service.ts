@@ -16,7 +16,7 @@ export class GeoService {
         this.geo = geofirex.init(firebase);
     }
 
-    async pushSingleAlert(id: string, coords: Coords): Promise<string> {
+    async pushSingleAlert(id: string, coords: Coords, userId: string): Promise<string> {
         return new Promise<string>(async resolve => {
             const alerts = this.geo.collection('alerts');
 
@@ -28,13 +28,19 @@ export class GeoService {
             }
 
             if (id) {
-                await alerts.setDoc(id, {coords: point, radius: 0, type: 'SINGLE'});
+                await alerts.setDoc(id, {coords: point, radius: 100, type: 'SINGLE', userId: userId});
                 resolve(id);
             } else {
-                const doc = await alerts.add({coords: point, radius: 0, type: 'SINGLE'});
+                const doc = await alerts.add({coords: point, radius: 100, type: 'SINGLE', userId: userId});
                 resolve(doc.id);
             }
         });
+    }
+
+    pushAreaAlert(coords: Coords, rad: number, userId: string) {
+        const alerts = this.geo.collection('alerts');
+        const point = this.geo.point(coords.latitude, coords.longitude).data;
+        alerts.add({coords: point, radius: rad, type: 'AREA', userId: userId});
     }
 
     getAlerts(coords: Coords, radius: number): Observable<GeoQueryDocument[]> {
