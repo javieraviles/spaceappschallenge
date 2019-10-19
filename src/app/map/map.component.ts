@@ -28,6 +28,7 @@ export class MapComponent implements OnInit {
     selectedAreaRadius = 0;
     isEditArea = false;
     selfAlertId = null;
+    singleAlertEnabled = false;
 
     constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService,
         private authService: AuthService, private alertController: AlertController) {
@@ -79,8 +80,12 @@ export class MapComponent implements OnInit {
         this.geo.pushAreaAlert(this.mapPosition, this.selectedAreaRadius, this.user.uid);
     }
 
-    clickAlert() {
+    createSingleAlert() {
         this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid);
+    }
+
+    deleteSingleAlert() {
+        this.geo.deleteAlert(this.selfAlertId);
     }
 
     editAreaAlert() {
@@ -116,9 +121,15 @@ export class MapComponent implements OnInit {
             this.alertsSubscription = this.geo.getAlerts(this.userCoords, this.radiusAlert).subscribe(documents => {
                 this.singleAlerts = [];
                 this.areaAlerts = [];
+                this.selfAlertId = null;
+                this.singleAlertEnabled = false;
                 documents.forEach(document => {
                     const value: any = document;
                     const alert: Alert = value as Alert;
+                    if((alert.userId == this.user.uid) && (alert.type == 'SINGLE')) {
+                        this.selfAlertId = alert.id;
+                        this.singleAlertEnabled = true;
+                    }
                     switch (alert.type) {
                         case 'SINGLE': {
                             this.singleAlerts.push(alert);
