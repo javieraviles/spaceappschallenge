@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 import * as geofirex from 'geofirex';
-import { GeoFireClient, GeoFirePoint, GeoQueryDocument } from 'geofirex';
+import {GeoFireClient, GeoFirePoint, GeoQueryDocument} from 'geofirex';
 import * as firebase from 'firebase/app';
-import { Coords } from '../models/coords';
+import {Coords} from '../models/coords';
 
 @Injectable({
     providedIn: 'root'
@@ -16,10 +16,25 @@ export class GeoService {
         this.geo = geofirex.init(firebase);
     }
 
-    pushAlert() {
-        const alerts = this.geo.collection('alerts');
-        const point = this.geo.point(40, -119);
-        alerts.add({ coords: point.data, radius: 0, type: 'SINGLE' });
+    async pushSingleAlert(id: string, coords: Coords): Promise<string> {
+        return new Promise<string>(async resolve => {
+            const alerts = this.geo.collection('alerts');
+
+            let point;
+            if (coords) {
+                point = this.geo.point(coords.latitude, coords.longitude).data;
+            } else {
+                point = null;
+            }
+
+            if (id) {
+                await alerts.setDoc(id, {coords: point, radius: 0, type: 'SINGLE'});
+                resolve(id);
+            } else {
+                const doc = await alerts.add({coords: point, radius: 0, type: 'SINGLE'});
+                resolve(doc.id);
+            }
+        });
     }
 
     getAlerts(coords: Coords, radius: number): Observable<GeoQueryDocument[]> {

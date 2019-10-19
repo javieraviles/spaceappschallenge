@@ -2,7 +2,7 @@
     
     <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15">
 
-        <agm-marker [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"></agm-marker>
+<!--        <agm-marker [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"></agm-marker>-->
 
         <agm-marker *ngFor="let alert of singleAlerts" [latitude]="alert.coords.geopoint._lat"
                     [longitude]="alert.coords.geopoint._long">

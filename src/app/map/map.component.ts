@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Coords } from '../models/coords';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { GeoService } from '../services/geo.service';
-import { AuthService } from '../services/authentication.service';
-import { UserService } from '../services/user.service';
-import { Subscription } from 'rxjs';
-import { Alert, User } from '../models';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Coords} from '../models/coords';
+import {Geolocation} from '@ionic-native/geolocation/ngx';
+import {GeoService} from '../services/geo.service';
+import {AuthService} from '../services/authentication.service';
+import {UserService} from '../services/user.service';
+import {Subscription} from 'rxjs';
+import {Alert, User} from '../models';
 
 @Component({
     selector: 'app-map',
@@ -14,16 +14,19 @@ import { Alert, User } from '../models';
 })
 export class MapComponent implements OnInit {
 
+    @Output() refreshCoords: EventEmitter<Coords> = new EventEmitter();
+
     radiusAlert = 100;
     updateDistance = 2;
-    userCoords: Coords = { longitude: null, latitude: null };
+    userCoords: Coords = {longitude: null, latitude: null};
     lastSearchCoords: Coords = null;
     alertsSubscription: Subscription = null;
     singleAlerts: Alert[] = [];
     areaAlerts: Alert[] = [];
     user: User;
 
-    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService, private authService: AuthService) {
+    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService,
+                private authService: AuthService) {
     }
 
     async ngOnInit() {
@@ -34,18 +37,15 @@ export class MapComponent implements OnInit {
     private getUserLocation() {
         const watch = this.geolocation.watchPosition();
         watch.subscribe((data) => {
-            this.userCoords = { latitude: data.coords.latitude, longitude: data.coords.longitude };
+            this.userCoords = {latitude: data.coords.latitude, longitude: data.coords.longitude};
             this.subscribeToAlerts();
             this.updateCoords(this.userCoords);
+            this.refreshCoords.emit(this.userCoords);
         });
     }
 
     updateCoords(coords: Coords) {
         this.userService.updateCoords(this.user.uid, coords);
-    }
-
-    createAlert() {
-        this.geo.pushAlert();
     }
 
     private subscribeToAlerts() {
@@ -57,6 +57,8 @@ export class MapComponent implements OnInit {
             this.singleAlerts = [];
             this.areaAlerts = [];
             this.alertsSubscription = this.geo.getAlerts(this.userCoords, this.radiusAlert).subscribe(documents => {
+                this.singleAlerts = [];
+                this.areaAlerts = [];
                 documents.forEach(document => {
                     const value: any = document;
                     const alert: Alert = value as Alert;
