@@ -12,13 +12,12 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onWrite((ch
     alertsCollection.doc(context.params.alertId).get().then(newAlert => {
         //Calculate distances
         console.log(newAlert);
-        var newAlertCoords = newAlert._fieldsProto.coords.geoPoint;
+        var newAlertCoords = newAlert._fieldsProto.coords.mapValue.fields.geopoint.geoPointValue;
+        console.log('newAlertCoords => ' + Object.keys(newAlertCoords));
         usersCollection.get().then(result => {
-            console.log('newAlertCoords => ' + newAlertCoords);
             result.forEach(user => {
-                var userCoords = user.data().coords;
-                console.log(user.id + ' => ' + userCoords);
-                var distance = calculateDistance(newAlertCoords.geoPointValue, userCoords);
+                var userCoords = user.data().coords.geopoint;
+                var distance = calculateDistance(newAlertCoords, userCoords);
                 console.log('distance: ' + distance);
             });
             return "";
@@ -38,25 +37,25 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onWrite((ch
  * Haversine formula. Note that this is approximate due to the fact that
  * the Earth's radius varies between 6356.752 km and 6378.137 km.
  *
- * @param {Object} location1 The first location given as .latitude and .longitude
- * @param {Object} location2 The second location given as .latitude and .longitude
+ * @param {Object} alertLocation The first location given as .latitude and .longitude
+ * @param {Object} userLocation The second location given as .latitude and .longitude
  * @return {number} The distance, in kilometers, between the inputted locations.
  */
-function calculateDistance(location1, location2) {
+function calculateDistance(alertLocation, userLocation) {
 
-    console.log("location1:" + location1);
-    console.log("location2:" + location2);
-    console.log("location1 latitude " +  location1.latitude);
-    console.log("location1 longitude " +  location1.longitude);
-    console.log("location2 latitude " +  location2._latitude);
-    console.log("location2 longitude " +  location2._longitude);
+    console.log("alertLocation:" + alertLocation);
+    console.log("userLocation:" + userLocation);
+    console.log("alertLocation latitude " +  alertLocation.latitude);
+    console.log("alertLocation longitude " +  alertLocation.longitude);
+    console.log("userLocation latitude " +  userLocation.latitude);
+    console.log("userLocation longitude " +  userLocation.longitude);
 
     const radius = 6371; // Earth's radius in kilometers
-    const latDelta = degreesToRadians(location2._latitude - location1.latitude);
-    const lonDelta = degreesToRadians(location2._longitude - location1.longitude);
+    const latDelta = degreesToRadians(userLocation.latitude - alertLocation.latitude);
+    const lonDelta = degreesToRadians(userLocation.longitude - alertLocation.longitude);
 
     const a = (Math.sin(latDelta / 2) * Math.sin(latDelta / 2)) +
-        (Math.cos(degreesToRadians(location1.latitude)) * Math.cos(degreesToRadians(location2._latitude)) *
+        (Math.cos(degreesToRadians(alertLocation.latitude)) * Math.cos(degreesToRadians(userLocation.latitude)) *
             Math.sin(lonDelta / 2) * Math.sin(lonDelta / 2));
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
