@@ -1,15 +1,16 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>
-      Map
-    </ion-title>
-    <button (click)="createAlert()">push alert testing</button>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>
+            Map
+        </ion-title>
+        <button (click)="clickAlert()">push alert testing</button>
+    </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <app-map></app-map>
+    <ion-button (click)="clickAlert()" style="position: absolute; z-index: 100;">Send Alert</ion-button>
+    <app-map (refreshCoords)="updateCoords($event)"></app-map>
 </ion-content>
