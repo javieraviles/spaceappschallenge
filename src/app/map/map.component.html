@@ -1,4 +1,5 @@
 <div *ngIf="userCoords.latitude && userCoords.longitude">
+    
     <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15">
 
         <agm-marker [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"></agm-marker>
