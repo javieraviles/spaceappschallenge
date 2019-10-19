@@ -1,0 +1,19 @@
+<div *ngIf="userCoords.latitude && userCoords.longitude">
+    <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15">
+
+        <agm-marker [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"></agm-marker>
+
+        <agm-marker *ngFor="let alert of singleAlerts" [latitude]="alert.coords.geopoint._lat"
+                    [longitude]="alert.coords.geopoint._long">
+            <agm-info-window>
+                <h3><strong>{{alert.type}}</strong></h3>
+                <p>{{alert.id}}</p>
+            </agm-info-window>
+        </agm-marker>
+
+        <agm-circle *ngFor="let alert of areaAlerts" [latitude]="alert.coords.geopoint._lat"
+                    [longitude]="alert.coords.geopoint._long" [radius]="alert.radius"
+                    fillColor="#B22222">
+        </agm-circle>
+    </agm-map>
+</div>

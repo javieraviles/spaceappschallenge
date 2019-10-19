@@ -4,29 +4,11 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>
-      Home
+      Map
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <ion-card class="welcome-card">
-      <img src="https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png" alt="NASA logo" />
-      <ion-card-header>
-        <ion-card-subtitle>Space Apps Challenge</ion-card-subtitle>
-        <ion-card-title>Welcome to Safety Network</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <p>Loogged in as {{user?.displayName}}.</p>
-      </ion-card-content>
-    </ion-card>
-    <ion-list lines="none">
-      <ion-list-header>
-        <ion-label>Resources</ion-label>
-      </ion-list-header>
-      <ion-item>
-        <ion-icon slot="start" color="medium" name="locate"></ion-icon>
-        <ion-label>{{myCoords | json}}</ion-label>
-      </ion-item>
-    </ion-list>
+    <app-map></app-map>
 </ion-content>
