@@ -13,22 +13,22 @@ export class HomePage implements OnInit {
   constructor(private geolocation: Geolocation, private db: AngularFirestore) { }
 
   ngOnInit(): void {
-    this.geolocation.getCurrentPosition().then((resp) => {
-      this.myCoords = { latitude: resp.coords.latitude, longitude: resp.coords.longitude };
-      this.persistCoords(this.myCoords);
-    }).catch((error) => {
-      console.log('Error getting location', error);
-    });
-
-    let watch = this.geolocation.watchPosition();
-    watch.subscribe((data) => {
-      this.myCoords = { latitude: data.coords.latitude, longitude: data.coords.longitude };
-      this.persistCoords(this.myCoords);
-    });
+    // this.geolocation.getCurrentPosition().then((resp) => {
+    //   this.myCoords = { latitude: resp.coords.latitude, longitude: resp.coords.longitude };
+    //   this.persistCoords(this.myCoords);
+    // }).catch((error) => {
+    //   console.log('Error getting location', error);
+    // });
+    //
+    // let watch = this.geolocation.watchPosition();
+    // watch.subscribe((data) => {
+    //   this.myCoords = { latitude: data.coords.latitude, longitude: data.coords.longitude };
+    //   this.persistCoords(this.myCoords);
+    // });
 
   }
 
-  persistCoords(coords: Coords) {
-    this.db.collection<Coords>('coords').doc('user-javi').set(coords);
-  }
+  // persistCoords(coords: Coords) {
+  //   this.db.collection<Coords>('coords').doc('user-javi').set(coords);
+  // }
 }
