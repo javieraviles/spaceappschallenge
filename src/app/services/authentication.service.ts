@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
-
+import { GeoFirePoint } from 'geofirex';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 
@@ -70,14 +70,14 @@ export class AuthService {
         return userRef.set(data);
     }
 
-    private async getUserLastCoords(userId: String): Promise<Coords> {
+    private async getUserLastCoords(userId: String): Promise<GeoFirePoint> {
         const user = await this.db.doc<User>(`users/${userId}`).valueChanges().toPromise();
         return user ? user.coords : null;
     }
 
     private async showLoader() {
         this.loader = await this.loadingCtrl.create({
-            message: "Loading...",
+            message: "Loading..."
         });
         this.loader.present();
     }
