@@ -11,22 +11,27 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onWrite((ch
     //Get created object
     alertsCollection.doc(context.params.alertId).get().then(newAlert => {
         //Calculate distances
+        var alertUserId = newAlert._fieldsProto.userId.stringValue;
+        var radius = newAlert._fieldsProto.radius.integerValue;
+        console.log("alertUserId: " + alertUserId);
+        console.log("radius:" + radius);
         var newAlertCoords = newAlert._fieldsProto.coords.mapValue.fields.geopoint.geoPointValue;
         usersCollection.get().then(result => {
             result.forEach(user => {
                 var userCoords = user.data().coords.geopoint;
                 var distance = calculateDistance(newAlertCoords, userCoords);
+                var userId = user.data().uid;
                 console.log("user " + user.data().displayName + " distance: " + distance);
-                if(distance < 1){
-                    var notification = "There was an alert created at " + distance.toFixed(2) + "km from your current postion";
+                if(distance < (radius / 1000) && userId !== alertUserId){
+                    var notification = "There was an alert created at " + distance.toFixed(2) + "km from your current position";
                     usersCollection.doc(user.data().uid).update({notification : notification});
                 }
             });
-            return;
+            return "";
         }).catch(err => {
             console.log('Error getting documents', err);
         });
-        return;
+        return "";
     }).catch(err => {
         console.log('Error getting newAlert ', err);
     })
@@ -45,8 +50,6 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onWrite((ch
  */
 function calculateDistance(alertLocation, userLocation) {
 
-    console.log("alertLocation:" + alertLocation);
-    console.log("userLocation:" + userLocation);
     console.log("alertLocation latitude " +  alertLocation.latitude);
     console.log("alertLocation longitude " +  alertLocation.longitude);
     console.log("userLocation latitude " +  userLocation.latitude);
