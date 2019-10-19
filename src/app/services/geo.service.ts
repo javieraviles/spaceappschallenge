@@ -37,6 +37,12 @@ export class GeoService {
         });
     }
 
+    pushAreaAlert(coords: Coords, rad: number) {
+        const alerts = this.geo.collection('alerts');
+        const point = this.geo.point(coords.latitude, coords.longitude).data;
+        alerts.add({coords: point, radius: rad, type: 'AREA'});
+    }
+
     getAlerts(coords: Coords, radius: number): Observable<GeoQueryDocument[]> {
         const geoPoint = this.geo.point(coords.latitude, coords.longitude);
         return this.geo.collection('alerts').within(geoPoint, radius, 'coords');

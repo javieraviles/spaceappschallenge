@@ -11,6 +11,7 @@
 </ion-header>
 
 <ion-content>
-    <ion-button (click)="clickAlert()" style="position: absolute; z-index: 100;">Send Alert</ion-button>
-    <app-map (refreshCoords)="updateCoords($event)"></app-map>
+    <ion-button *ngIf="!isEditArea" (click)="clickAlert()" style="position: absolute; z-index: 100; left: 10px">Send Alert</ion-button>
+    <ion-button *ngIf="!isEditArea" (click)="editAreaAlert()" style="position: absolute; z-index: 100; right: 10px">Area Alert</ion-button>
+    <app-map (refreshCoords)="updateCoords($event)" [isEditArea]="isEditArea"></app-map>
 </ion-content>

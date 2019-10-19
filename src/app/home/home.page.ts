@@ -8,14 +8,22 @@ import {Coords} from '../models';
     styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+
+    isEditArea = false;
+
+    selfCoords: Coords;
+    selfAlertId = null;
+
     constructor(private geoService: GeoService) {
     }
 
-    selfCoords: Coords
-    selfAlertId = null;
 
     clickAlert() {
         this.geoService.pushSingleAlert(this.selfAlertId, this.selfCoords);
+    }
+
+    editAreaAlert() {
+        this.isEditArea = true;
     }
 
     async updateCoords(coords: Coords) {

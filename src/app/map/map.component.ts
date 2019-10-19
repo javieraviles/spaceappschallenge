@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Coords} from '../models/coords';
 import {Geolocation} from '@ionic-native/geolocation/ngx';
 import {GeoService} from '../services/geo.service';
@@ -6,6 +6,7 @@ import {AuthService} from '../services/authentication.service';
 import {UserService} from '../services/user.service';
 import {Subscription} from 'rxjs';
 import {Alert, User} from '../models';
+import {LatLngLiteral} from "@agm/core";
 
 @Component({
     selector: 'app-map',
@@ -14,16 +15,25 @@ import {Alert, User} from '../models';
 })
 export class MapComponent implements OnInit {
 
+    @Input() isEditArea = false;
+
     @Output() refreshCoords: EventEmitter<Coords> = new EventEmitter();
 
     radiusAlert = 100;
     updateDistance = 2;
+
+    mapPosition: Coords = {longitude: null, latitude: null};
+
     userCoords: Coords = {longitude: null, latitude: null};
+
     lastSearchCoords: Coords = null;
     alertsSubscription: Subscription = null;
     singleAlerts: Alert[] = [];
     areaAlerts: Alert[] = [];
+
     user: User;
+
+    selectedAreaRadius = 0;
 
     constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService,
                 private authService: AuthService) {
@@ -32,6 +42,19 @@ export class MapComponent implements OnInit {
     async ngOnInit() {
         this.user = await this.authService.getLoggedInUser();
         this.getUserLocation();
+    }
+
+    onCenterChange(event: LatLngLiteral) {
+        this.mapPosition = {latitude: event.lat, longitude: event.lng};
+    }
+
+    onChangeArea(event: any) {
+        this.selectedAreaRadius = +event.detail.value;
+    }
+
+    sendAreaAlert() {
+        this.isEditArea = false;
+        this.geo.pushAreaAlert(this.mapPosition, this.selectedAreaRadius);
     }
 
     private getUserLocation() {
