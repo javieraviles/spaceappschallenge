@@ -42,7 +42,6 @@ export class MapComponent implements OnInit {
 
     updateCoords(coords: Coords) {
         this.userService.updateCoords(this.user.uid, coords);
-        console.log('coords updated');
     }
 
     createAlert() {
