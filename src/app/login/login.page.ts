@@ -49,6 +49,10 @@ export class LoginPage implements OnInit {
 
   }
 
+  ionViewWillEnter() {
+    this.menuController.enable(false);
+  }
+
   swapSignup() {
     this.signupEnabled = !this.signupEnabled;
     if (this.signupEnabled) {

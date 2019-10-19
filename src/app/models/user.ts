@@ -4,4 +4,5 @@ export class User {
     displayName?: string;
     photoURL?: string;
     coords?: any;
+    notification?: string;
 }

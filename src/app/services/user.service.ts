@@ -17,4 +17,12 @@ export class UserService {
         const geoPoint: GeoFirePoint = this.geo.point(coords.latitude, coords.longitude);
         this.db.collection<User>('users').doc(userId).update({ coords: geoPoint.data });
     }
+
+    getUser(userId: string) {
+        return this.db.doc<User>(`users/${userId}`);
+    }
+
+    removeNotification(userId: string) {
+        this.db.collection<User>('users').doc(userId).update({ notification: null });
+    }
 }

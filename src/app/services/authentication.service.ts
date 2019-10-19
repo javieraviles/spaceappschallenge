@@ -31,7 +31,8 @@ export class AuthService {
                 const data: User = {
                     email: credentials.user.email,
                     displayName: displayName,
-                    uid: credentials.user.uid
+                    uid: credentials.user.uid,
+                    notification: null
                 }
                 return this.createUserData(data).then(() => {
                     this.afAuth.auth.currentUser.updateProfile({ displayName: displayName, photoURL: "" });
@@ -58,21 +59,21 @@ export class AuthService {
 
     private async updateUserData(user: User) {
         const userRef: AngularFirestoreDocument<User> = this.db.doc(`users/${user.uid}`);
-        const userCoords = await this.getUserLastCoords(user.uid);
+        const userLastStatus = await this.getUserLastStatus(user.uid);
         const data: User = {
             email: user.email,
             displayName: user.displayName,
             uid: user.uid,
             photoURL: user.photoURL,
-            coords: userCoords
+            coords: userLastStatus.coords,
+            notification: userLastStatus.notification
         }
 
         return userRef.set(data);
     }
 
-    private async getUserLastCoords(userId: String): Promise<GeoFirePoint> {
-        const user = await this.db.doc<User>(`users/${userId}`).valueChanges().toPromise();
-        return user ? user.coords : null;
+    private async getUserLastStatus(userId: String): Promise<User> {
+        return await this.db.doc<User>(`users/${userId}`).valueChanges().toPromise();
     }
 
     private async showLoader() {

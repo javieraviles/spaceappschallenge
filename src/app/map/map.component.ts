@@ -6,6 +6,7 @@ import { AuthService } from '../services/authentication.service';
 import { UserService } from '../services/user.service';
 import { Subscription } from 'rxjs';
 import { Alert, User } from '../models';
+import { AlertController } from '@ionic/angular';
 
 @Component({
     selector: 'app-map',
@@ -23,12 +24,40 @@ export class MapComponent implements OnInit {
     areaAlerts: Alert[] = [];
     user: User;
 
-    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService, private authService: AuthService) {
+    constructor(private geolocation: Geolocation, private geo: GeoService, private userService: UserService, private authService: AuthService, private alertController: AlertController) {
     }
 
     async ngOnInit() {
+
         this.user = await this.authService.getLoggedInUser();
         this.getUserLocation();
+        this.userService.getUser(this.user.uid).valueChanges().subscribe((user) => {
+            if (user.notification) {
+                this.presentNotification();
+            }
+        });
+    }
+    async presentNotification() {
+        const alert = await this.alertController.create({
+            header: 'Alert near you!',
+            subHeader: 'there is a big fire, run!',
+            message: 'ARE YOU SAFE?',
+            buttons: [{
+                text: 'NO',
+                role: 'cancel',
+                cssClass: 'secondary',
+                handler: (blah) => {
+                    this.userService.removeNotification(this.user.uid);
+                    this.geo.pushAlert();
+                }
+            }, {
+                text: 'YES',
+                handler: () => {
+                    this.userService.removeNotification(this.user.uid);   
+                }
+            }]
+        });
+        await alert.present();
     }
 
     private getUserLocation() {
