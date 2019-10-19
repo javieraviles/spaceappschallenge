@@ -1,9 +1,10 @@
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import * as geofirex from 'geofirex';
-import {GeoFireClient, GeoFirePoint, GeoQueryDocument} from 'geofirex';
+import { GeoFireClient, GeoFirePoint, GeoQueryDocument } from 'geofirex';
+import { AngularFirestore } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
-import {Coords} from '../models/coords';
+import { Coords, Alert } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ export class GeoService {
 
     geo: GeoFireClient;
 
-    constructor() {
+    constructor(private db: AngularFirestore) {
         this.geo = geofirex.init(firebase);
     }
 
@@ -28,10 +29,10 @@ export class GeoService {
             }
 
             if (id) {
-                await alerts.setDoc(id, {coords: point, radius: 100, type: 'SINGLE', userId: userId});
+                await alerts.setDoc(id, { coords: point, radius: 100, type: 'SINGLE', userId: userId });
                 resolve(id);
             } else {
-                const doc = await alerts.add({coords: point, radius: 100, type: 'SINGLE', userId: userId});
+                const doc = await alerts.add({ coords: point, radius: 100, type: 'SINGLE', userId: userId });
                 resolve(doc.id);
             }
         });
@@ -40,12 +41,20 @@ export class GeoService {
     pushAreaAlert(coords: Coords, rad: number, userId: string) {
         const alerts = this.geo.collection('alerts');
         const point = this.geo.point(coords.latitude, coords.longitude).data;
-        alerts.add({coords: point, radius: rad, type: 'AREA', userId: userId});
+        alerts.add({ coords: point, radius: rad, type: 'AREA', userId: userId });
     }
 
     getAlerts(coords: Coords, radius: number): Observable<GeoQueryDocument[]> {
         const geoPoint = this.geo.point(coords.latitude, coords.longitude);
         return this.geo.collection('alerts').within(geoPoint, radius, 'coords');
+    }
+
+    getUserSingleAlert(userId: string) {
+        return this.db.collection<Alert>('alerts', ref => ref.where('userId', '==', userId)).valueChanges();
+    }
+
+    deleteAlert(alertId: string) {
+        return this.db.doc<Alert>(`alerts/${alertId}`).delete();
     }
 
     getDistance(pointA: Coords, pointB: Coords): number {

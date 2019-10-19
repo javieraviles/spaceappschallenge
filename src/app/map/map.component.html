@@ -1,5 +1,6 @@
 <div *ngIf="userCoords.latitude && userCoords.longitude">
-    <ion-button *ngIf="!isEditArea" (click)="clickAlert()" style="position: absolute; z-index: 100; left: 10px">Send Alert</ion-button>
+    <ion-button *ngIf="!isEditArea && !singleAlertEnabled" (click)="createSingleAlert()" style="position: absolute; z-index: 100; left: 10px">Send Alert</ion-button>
+    <ion-button color='danger' *ngIf="!isEditArea && singleAlertEnabled" (click)="deleteSingleAlert()" style="position: absolute; z-index: 100; left: 10px">Stop Alert</ion-button>
     <ion-button *ngIf="!isEditArea" (click)="editAreaAlert()" style="position: absolute; z-index: 100; right: 10px">Area Alert</ion-button>
     <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15"
              (centerChange)="onCenterChange($event)">

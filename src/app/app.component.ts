@@ -14,9 +14,9 @@ import { Router } from '@angular/router';
 export class AppComponent {
   public appPages = [
     {
-      title: 'Home',
+      title: 'Map',
       url: '/home',
-      icon: 'home'
+      icon: 'navigate'
     }
   ];
 
