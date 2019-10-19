@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { Coords } from '../models/Coords';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AuthService } from '../services/authentication.service';
+import { UserService } from '../services/user.service';
+import { User, Coords } from '../models';
 
 @Component({
   selector: 'app-home',
@@ -10,12 +11,14 @@ import { AngularFirestore } from '@angular/fire/firestore';
 })
 export class HomePage implements OnInit {
   myCoords: Coords;
-  constructor(private geolocation: Geolocation, private db: AngularFirestore) { }
+  user: User;
+  constructor(private geolocation: Geolocation,  private authService: AuthService, private userService: UserService) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    this.user = await this.authService.getLoggedInUser();
     this.geolocation.getCurrentPosition().then((resp) => {
       this.myCoords = { latitude: resp.coords.latitude, longitude: resp.coords.longitude };
-      this.persistCoords(this.myCoords);
+      this.updateCoords(this.myCoords);
     }).catch((error) => {
       console.log('Error getting location', error);
     });
@@ -23,12 +26,13 @@ export class HomePage implements OnInit {
     let watch = this.geolocation.watchPosition();
     watch.subscribe((data) => {
       this.myCoords = { latitude: data.coords.latitude, longitude: data.coords.longitude };
-      this.persistCoords(this.myCoords);
+      this.updateCoords(this.myCoords);
     });
 
   }
 
-  persistCoords(coords: Coords) {
-    this.db.collection<Coords>('coords').doc('user-javi').set(coords);
+  updateCoords(coords: Coords) {
+    this.userService.updateCoords(this.user.uid, coords);
+    console.log('coords updated');
   }
 }
