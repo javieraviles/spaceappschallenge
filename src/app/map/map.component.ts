@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {Coords} from "../models/coords";
-import {Geolocation} from "@ionic-native/geolocation/ngx";
-import {GeoService} from "../services/geo.service";
-import {Subscription} from "rxjs";
+import {Coords} from '../models/coords';
+import {Geolocation} from '@ionic-native/geolocation/ngx';
+import {GeoService} from '../services/geo.service';
+import {Subscription} from 'rxjs';
+import {Alert} from '../models/Alert';
 
 @Component({
     selector: 'app-map',
@@ -18,7 +19,8 @@ export class MapComponent implements OnInit {
     lastSearchCoords: Coords = null;
 
     alertsSubscription: Subscription = null;
-    alerts: any[] = [];
+    singleAlerts: Alert[] = [];
+    areaAlerts: Alert[] = [];
 
 
     constructor(private geolocation: Geolocation, private geo: GeoService) {
@@ -31,20 +33,39 @@ export class MapComponent implements OnInit {
     private getUserLocation() {
         const watch = this.geolocation.watchPosition();
         watch.subscribe((data) => {
-            const newCoords = {latitude: data.coords.latitude, longitude: data.coords.longitude};
-            this.userCoords = newCoords;
-
-            if (!this.lastSearchCoords || this.geo.getDistance(this.userCoords, this.lastSearchCoords) > this.updateDistance) {
-                this.lastSearchCoords = newCoords;
-                if (this.alertsSubscription) {
-                    this.alertsSubscription.unsubscribe();
-                }
-                this.alerts = [];
-                this.alertsSubscription = this.geo.getAlerts(newCoords, this.radiusAlert).subscribe(value => {
-                    this.alerts.push(value);
-                    console.log('' + value);
-                });
-            }
+            this.userCoords = {latitude: data.coords.latitude, longitude: data.coords.longitude};
+            this.subscribeToAlerts();
         });
+    }
+
+    private subscribeToAlerts() {
+        if (!this.lastSearchCoords || this.geo.getDistance(this.userCoords, this.lastSearchCoords) > this.updateDistance) {
+            this.lastSearchCoords = this.userCoords;
+            if (this.alertsSubscription) {
+                this.alertsSubscription.unsubscribe();
+            }
+            this.singleAlerts = [];
+            this.areaAlerts = [];
+            this.alertsSubscription = this.geo.getAlerts(this.userCoords, this.radiusAlert).subscribe(documents => {
+                documents.forEach(document => {
+                    const value: any = document;
+                    const alert: Alert = value as Alert;
+                    switch (alert.type) {
+                        case 'SINGLE': {
+                            this.singleAlerts.push(alert);
+                            break;
+                        }
+                        case 'AREA': {
+                            this.areaAlerts.push(alert);
+                            break;
+                        }
+                        default: {
+                            console.warn('Undefined type of alert: ' + alert.type);
+                            break;
+                        }
+                    }
+                });
+            });
+        }
     }
 }
