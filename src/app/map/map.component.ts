@@ -108,7 +108,7 @@ export class MapComponent implements OnInit {
                 return '#2E8B57';
             }
             default: {
-                return '#A9A9A9';
+                return '#696969';
             }
         }
     }
@@ -173,7 +173,7 @@ export class MapComponent implements OnInit {
                 documents.forEach(document => {
                     const value: any = document;
                     const alert: Alert = value as Alert;
-                    if ((alert.userId == this.user.uid) && (alert.type == 'SINGLE')) {
+                    if ((alert.userId === this.user.uid) && (alert.type === 'SINGLE')) {
                         this.selfAlertId = alert.id;
                         this.singleAlertEnabled = true;
                     }
