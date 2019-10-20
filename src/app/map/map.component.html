@@ -11,7 +11,7 @@
     </ion-button>
 
     <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15"
-             (centerChange)="onCenterChange($event)">
+             (centerChange)="onCenterChange($event)"  [streetViewControl]="false" [panControl]="true">
 
         <!--        <agm-marker [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"></agm-marker>-->
 
