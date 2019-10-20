@@ -25,6 +25,7 @@ export class MapComponent implements OnInit {
     singleAlerts: Alert[] = [];
     areaAlerts: Alert[] = [];
     user: User;
+    userInfo: User;
 
     // Area alert vairables
     isEditArea = false;
@@ -40,19 +41,19 @@ export class MapComponent implements OnInit {
     }
 
     async ngOnInit() {
-
         this.user = await this.authService.getLoggedInUser();
         this.getUserLocation();
         this.userService.getUser(this.user.uid).valueChanges().subscribe((user) => {
-            if (user.notification) {
-                this.presentNotification();
+            this.userInfo = user;
+            if (user.notification && !this.singleAlertEnabled) {
+                this.presentNotification(user.notification);
             }
         });
     }
-    async presentNotification() {
+    async presentNotification(notification: string) {
         const alert = await this.alertController.create({
             header: 'Alert near you!',
-            subHeader: 'there is a big fire, run!',
+            subHeader: notification,
             message: 'ARE YOU SAFE?',
             buttons: [{
                 text: 'NO',
@@ -60,7 +61,7 @@ export class MapComponent implements OnInit {
                 cssClass: 'secondary',
                 handler: (blah) => {
                     this.userService.removeNotification(this.user.uid);
-                    this.geo.pushSingleAlert(null, this.userCoords, this.user.uid);
+                    this.geo.pushSingleAlert(null, this.userCoords, this.user.uid, this.userInfo.gender, this.calculateAge(this.userInfo.birth));
                 }
             }, {
                 text: 'YES',
@@ -89,13 +90,13 @@ export class MapComponent implements OnInit {
             case 'FIRE': {
                 return '#B22222';
             }
-            case  'FLOOD': {
+            case 'FLOOD': {
                 return '#1E90FF';
             }
-            case  'EARTHQUAKE': {
+            case 'EARTHQUAKE': {
                 return '#CD853F';
             }
-            case  'BIO': {
+            case 'BIO': {
                 return '#2E8B57';
             }
             default: {
@@ -114,7 +115,7 @@ export class MapComponent implements OnInit {
     }
 
     createSingleAlert() {
-        this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid);
+        this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid, this.userInfo.gender, this.calculateAge(this.userInfo.birth));
     }
 
     deleteSingleAlert() {
@@ -134,7 +135,7 @@ export class MapComponent implements OnInit {
             this.subscribeToAlerts();
             this.updateCoords(this.userCoords);
             if (this.selfAlertId) {
-                this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid).then((value) => {
+                this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid, this.userInfo.gender, this.calculateAge(this.userInfo.birth)).then((value) => {
                     this.selfAlertId = value;
                 });
             }
@@ -164,7 +165,7 @@ export class MapComponent implements OnInit {
                 documents.forEach(document => {
                     const value: any = document;
                     const alert: Alert = value as Alert;
-                    if((alert.userId == this.user.uid) && (alert.type == 'SINGLE')) {
+                    if ((alert.userId == this.user.uid) && (alert.type == 'SINGLE')) {
                         this.selfAlertId = alert.id;
                         this.singleAlertEnabled = true;
                     }
@@ -185,5 +186,10 @@ export class MapComponent implements OnInit {
                 });
             });
         }
+    }
+
+    private calculateAge(birth: number) {
+        const currentYear = new Date().getFullYear();
+        return currentYear - birth;
     }
 }

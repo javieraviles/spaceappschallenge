@@ -29,11 +29,15 @@ export class LoginPage implements OnInit {
 
     this.loginForm = this.formBuilder.group({
       name: ['', Validators.required],
+      gender: ['', Validators.required],
+      birth: ['', Validators.required],
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
     // at first, only login is shown, so name won't be required until signup is enabled
     this.loginForm.controls['name'].disable();
+    this.loginForm.controls['gender'].disable();
+    this.loginForm.controls['birth'].disable();
 
     this.loading = false;
     this.submitted = false;
@@ -59,10 +63,14 @@ export class LoginPage implements OnInit {
       this.submitButtonLabel = 'Sign Up';
       this.clearButtonLabel = 'Cancel';
       this.loginForm.controls['name'].enable();
+      this.loginForm.controls['gender'].enable();
+      this.loginForm.controls['birth'].enable();
     } else {
       this.submitButtonLabel = 'Log In';
       this.clearButtonLabel = 'Sign Up';
       this.loginForm.controls['name'].disable();
+      this.loginForm.controls['gender'].disable();
+      this.loginForm.controls['birth'].disable();
     }
   }
 
@@ -88,7 +96,7 @@ export class LoginPage implements OnInit {
     if (this.signupEnabled) {
 
       this.loading = true;
-      this.authService.emailSignUp(this.f.username.value, this.f.password.value, this.f.name.value).then(
+      this.authService.emailSignUp(this.f.username.value, this.f.password.value, this.f.name.value, this.f.gender.value, new Date(this.f.birth.value).getFullYear()).then(
         data => {
           this.router.navigate([this.returnUrl]);
           this.loading = false;

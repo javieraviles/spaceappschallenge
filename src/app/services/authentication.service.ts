@@ -25,14 +25,16 @@ export class AuthService {
         return user;
     }
 
-    emailSignUp(email: string, password: string, displayName: string) {
+    emailSignUp(email: string, password: string, displayName: string, gender: string, birth: number) {
         return this.afAuth.auth.createUserWithEmailAndPassword(email, password)
             .then((credentials) => {
                 const data: User = {
                     email: credentials.user.email,
                     displayName: displayName,
                     uid: credentials.user.uid,
-                    notification: null
+                    notification: null,
+                    gender: gender,
+                    birth: birth
                 }
                 return this.createUserData(data).then(() => {
                     this.afAuth.auth.currentUser.updateProfile({ displayName: displayName, photoURL: "" });
@@ -63,10 +65,12 @@ export class AuthService {
         const data: User = {
             email: user.email,
             displayName: user.displayName,
-            uid: user.uid,
+            uid: user.uid,  
             photoURL: user.photoURL,
             coords: userLastStatus.coords,
-            notification: userLastStatus.notification
+            notification: userLastStatus.notification,
+            gender: userLastStatus.gender,
+            birth: userLastStatus.birth
         }
 
         return userRef.set(data);

@@ -4,6 +4,8 @@ export interface Alert {
     type: string;
     radius: number;
     userId: string;
-    hazard: string;
+    hazard?: string;
     timestamp: Date;
+    gender?: string;
+    age?: number;
 }

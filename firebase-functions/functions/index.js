@@ -13,8 +13,10 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onCreate((c
         //Calculate distances
         var alertUserId = newAlert._fieldsProto.userId.stringValue;
         var radius = newAlert._fieldsProto.radius.integerValue;
+        var hazard = newAlert._fieldsProto.hazard.stringValue;
         console.log("alertUserId: " + alertUserId);
         console.log("radius:" + radius);
+        console.log("hazard" + hazard);
         var newAlertCoords = newAlert._fieldsProto.coords.mapValue.fields.geopoint.geoPointValue;
         usersCollection.get().then(result => {
             result.forEach(user => {
@@ -23,7 +25,7 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onCreate((c
                 var userId = user.data().uid;
                 console.log("user " + user.data().displayName + " distance: " + distance);
                 if(distance < (radius / 1000) && userId !== alertUserId){
-                    var notification = "There was an alert created at " + distance.toFixed(2) + "km from your current position";
+                    var notification = "There was a " + hazard + " at " + distance.toFixed(2) + "km from your current position";
                     usersCollection.doc(user.data().uid).update({notification : notification});
                 }
             });

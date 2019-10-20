@@ -5,4 +5,6 @@ export class User {
     photoURL?: string;
     coords?: any;
     notification?: string;
+    gender?: string;
+    birth?: number;
 }
