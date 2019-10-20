@@ -3,7 +3,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.useAlerts = functions.firestore.document('alerts/{alertId}').onWrite((change, context) => {
+exports.useAlerts = functions.firestore.document('alerts/{alertId}').onCreate((change, context) => {
     var db = admin.firestore();
     var alertsCollection = db.collection('alerts');
     var usersCollection = db.collection('users');
