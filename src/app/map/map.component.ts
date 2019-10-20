@@ -18,15 +18,20 @@ export class MapComponent implements OnInit {
 
     radiusAlert = 100;
     updateDistance = 2;
-    mapPosition: Coords = { longitude: null, latitude: null };
+    mapPosition: Coords = null;
     userCoords: Coords = { longitude: null, latitude: null };
     lastSearchCoords: Coords = null;
     alertsSubscription: Subscription = null;
     singleAlerts: Alert[] = [];
     areaAlerts: Alert[] = [];
     user: User;
-    selectedAreaRadius = 0;
+
+    // Area alert vairables
     isEditArea = false;
+    selectedAreaRadius = 0;
+    selectedHazard = '';
+
+    // Self alert variables.
     selfAlertId = null;
     singleAlertEnabled = false;
 
@@ -75,9 +80,37 @@ export class MapComponent implements OnInit {
         this.selectedAreaRadius = +event.detail.value;
     }
 
+    onChangeHazard(event: any) {
+        this.selectedHazard = event.detail.value;
+    }
+
+    getHazardColor(hazard: string) {
+        switch (hazard) {
+            case 'FIRE': {
+                return '#B22222';
+            }
+            case  'FLOOD': {
+                return '#1E90FF';
+            }
+            case  'EARTHQUAKE': {
+                return '#CD853F';
+            }
+            case  'BIO': {
+                return '#2E8B57';
+            }
+            default: {
+                return '#A9A9A9';
+            }
+        }
+    }
+
     sendAreaAlert() {
         this.isEditArea = false;
-        this.geo.pushAreaAlert(this.mapPosition, this.selectedAreaRadius, this.user.uid);
+        this.geo.pushAreaAlert(this.mapPosition, this.selectedAreaRadius, this.selectedHazard, this.user.uid);
+    }
+
+    cancelAreaAlert() {
+        this.isEditArea = false;
     }
 
     createSingleAlert() {
@@ -89,6 +122,8 @@ export class MapComponent implements OnInit {
     }
 
     editAreaAlert() {
+        this.selectedHazard = 'GENERIC';
+        this.selectedAreaRadius = 100;
         this.isEditArea = true;
     }
 
@@ -102,6 +137,9 @@ export class MapComponent implements OnInit {
                 this.geo.pushSingleAlert(this.selfAlertId, this.userCoords, this.user.uid).then((value) => {
                     this.selfAlertId = value;
                 });
+            }
+            if (!this.mapPosition) {
+                this.mapPosition = this.userCoords;
             }
         });
     }
