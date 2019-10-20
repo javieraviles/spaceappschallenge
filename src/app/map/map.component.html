@@ -27,6 +27,10 @@
         <agm-circle *ngFor="let alert of areaAlerts" [latitude]="alert.coords.geopoint._lat"
                     [longitude]="alert.coords.geopoint._long" [radius]="alert.radius"
                     [fillColor]="getHazardColor(alert.hazard)">
+            <agm-info-window>
+                <h3><strong>{{alert.hazard}}years</strong></h3>
+                <p>{{alert.timestamp?.toDate() | date: 'MMM d, y, h:mm:ss a'}}</p>
+            </agm-info-window>
         </agm-circle>
 
         <agm-circle *ngIf="isEditArea" [latitude]="mapPosition.latitude" [longitude]="mapPosition.longitude"
