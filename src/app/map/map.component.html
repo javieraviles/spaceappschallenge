@@ -1,7 +1,15 @@
-<div *ngIf="userCoords.latitude && userCoords.longitude">
-    <ion-button *ngIf="!isEditArea && !singleAlertEnabled" (click)="createSingleAlert()" style="position: absolute; z-index: 100; left: 10px">Send Alert</ion-button>
-    <ion-button color='danger' *ngIf="!isEditArea && singleAlertEnabled" (click)="deleteSingleAlert()" style="position: absolute; z-index: 100; left: 10px">Stop Alert</ion-button>
-    <ion-button *ngIf="!isEditArea" (click)="editAreaAlert()" style="position: absolute; z-index: 100; right: 10px">Area Alert</ion-button>
+<div class="map-content" *ngIf="userCoords.latitude && userCoords.longitude">
+
+    <ion-button *ngIf="!isEditArea && !singleAlertEnabled" (click)="createSingleAlert()"
+                style="position: absolute; z-index: 100; left: 10px">Send Alert
+    </ion-button>
+    <ion-button color='danger' *ngIf="!isEditArea && singleAlertEnabled" (click)="deleteSingleAlert()"
+                style="position: absolute; z-index: 100; left: 10px">Stop Alert
+    </ion-button>
+    <ion-button *ngIf="!isEditArea" (click)="editAreaAlert()" style="position: absolute; z-index: 100; right: 10px">Area
+        Alert
+    </ion-button>
+
     <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15"
              (centerChange)="onCenterChange($event)">
 
@@ -17,35 +25,62 @@
 
         <agm-circle *ngFor="let alert of areaAlerts" [latitude]="alert.coords.geopoint._lat"
                     [longitude]="alert.coords.geopoint._long" [radius]="alert.radius"
-                    fillColor="#B22222">
+                    [fillColor]="getHazardColor(alert.hazard)">
         </agm-circle>
 
         <agm-circle *ngIf="isEditArea" [latitude]="mapPosition.latitude" [longitude]="mapPosition.longitude"
-                    [radius]="selectedAreaRadius" fillColor="#B22222" strokeColor="#808080">
+                    [radius]="selectedAreaRadius" [fillColor]="getHazardColor(selectedHazard)">
         </agm-circle>
     </agm-map>
 
-    <ion-list *ngIf="isEditArea" style="position: absolute; z-index: 100">
-        <ion-radio-group (ionChange)="onChangeArea($event)">
+    <!-- EDITING AREA ALERT -->
+    <ion-toolbar *ngIf="isEditArea" class="select-area-size">
+        <ion-segment (ionChange)="onChangeArea($event)" mode="ios">
+            <ion-segment-button value="100" checked>
+                <ion-label>Small</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="500">
+                <ion-label>Medium</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="1000">
+                <ion-label>Large</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+
+    <ion-list *ngIf="isEditArea" class="select-area-hazard">
+        <ion-radio-group (ionChange)="onChangeHazard($event)">
             <ion-list-header>
-                <ion-label>Alert Size</ion-label>
+                <ion-label>Hazard Type</ion-label>
             </ion-list-header>
 
             <ion-item>
-                <ion-label>Large</ion-label>
-                <ion-radio slot="start" value="1000" checked></ion-radio>
+                <ion-label>Generic</ion-label>
+                <ion-radio slot="start" value="GENERIC" checked></ion-radio>
             </ion-item>
-
             <ion-item>
-                <ion-label>Medium</ion-label>
-                <ion-radio slot="start" value="500"></ion-radio>
+                <ion-label>Fire</ion-label>
+                <ion-radio slot="start" value="FIRE"></ion-radio>
             </ion-item>
-
             <ion-item>
-                <ion-label>Small</ion-label>
-                <ion-radio slot="start" value="100"></ion-radio>
+                <ion-label>Flood</ion-label>
+                <ion-radio slot="start" value="FLOOD"></ion-radio>
+            </ion-item>
+            <ion-item>
+                <ion-label>Earthquake</ion-label>
+                <ion-radio slot="start" value="EARTHQUAKE"></ion-radio>
+            </ion-item>
+            <ion-item>
+                <ion-label>Biological</ion-label>
+                <ion-radio slot="start" value="BIO"></ion-radio>
             </ion-item>
         </ion-radio-group>
     </ion-list>
-    <ion-button *ngIf="isEditArea" (click)="sendAreaAlert()" style="position: absolute; z-index: 100; bottom: 10px">Send Area Alert</ion-button>
+    <ion-button *ngIf="isEditArea" (click)="sendAreaAlert()" class="btn-send-area" color="danger">
+        <ion-icon name="alert"></ion-icon>
+        <ion-label> Send Area Alert</ion-label>
+    </ion-button>
+    <ion-button *ngIf="isEditArea" (click)="cancelAreaAlert()" class="btn-cancel-area" fill="clear" color="dark">
+        <ion-icon name="close"></ion-icon>
+    </ion-button>
 </div>
