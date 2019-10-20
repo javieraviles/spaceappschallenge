@@ -1,10 +1,21 @@
 <ion-content padding>
-    <ion-img style="max-width: 50%; display: block; margin-left: auto; margin-right: auto;"
-        src="https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png"></ion-img>
+    <ion-img style="max-height: 300px;max-width: 600px; height:100%; width:100%;display: block; margin-left: auto; margin-right: auto;"
+        src="../../assets/logo_transparent.png"></ion-img>
     <form [formGroup]="loginForm">
         <ion-item *ngIf="signupEnabled">
             <ion-label position="floating">Your Name</ion-label>
             <ion-input type="text" formControlName="name" minlength="5" maxlength="80"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="signupEnabled">
+            <ion-label position="floating">Year of birth</ion-label>
+            <ion-datetime formControlName="birth" displayFormat="YYYY" pickerFormat="YYYY"></ion-datetime>
+        </ion-item>
+        <ion-item *ngIf="signupEnabled">
+            <ion-label position="floating">Gender</ion-label>
+            <ion-select placeholder="Select One" formControlName="gender">
+                <ion-select-option value="female">Female</ion-select-option>
+                <ion-select-option value="male">Male</ion-select-option>
+            </ion-select>
         </ion-item>
         <ion-item>
             <ion-label position="floating">Your Email</ion-label>
@@ -23,5 +34,6 @@
     <ion-button [disabled]="loading" fill="clear" expand="block" (click)="swapSignup()">
         {{clearButtonLabel}}
     </ion-button>
-
+    <ion-img style="max-height: 300px;max-width: 600px; height:100%; width:100%; display: block; margin-left: auto; margin-right: auto;"
+        src="../../assets/logo_nasa.png"></ion-img>
 </ion-content>

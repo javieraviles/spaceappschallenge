@@ -17,7 +17,7 @@ export class GeoService {
         this.geo = geofirex.init(firebase);
     }
 
-    async pushSingleAlert(id: string, coords: Coords, userId: string): Promise<string> {
+    async pushSingleAlert(id: string, coords: Coords, userId: string, gender: string, age: number): Promise<string> {
         return new Promise<string>(async resolve => {
             const alerts = this.geo.collection('alerts');
 
@@ -29,10 +29,10 @@ export class GeoService {
             }
 
             if (id) {
-                await alerts.setDoc(id, { coords: point, radius: 100, type: 'SINGLE', userId: userId });
+                await alerts.setDoc(id, { coords: point, radius: 100, type: 'SINGLE', userId: userId, gender: gender, age: age, timestamp: new Date() });
                 resolve(id);
             } else {
-                const doc = await alerts.add({ coords: point, radius: 100, type: 'SINGLE', userId: userId });
+                const doc = await alerts.add({ coords: point, radius: 100, type: 'SINGLE', userId: userId, gender: gender, age: age, timestamp: new Date() });
                 resolve(doc.id);
             }
         });

@@ -10,8 +10,8 @@
         <agm-marker *ngFor="let alert of singleAlerts" [latitude]="alert.coords.geopoint._lat"
                     [longitude]="alert.coords.geopoint._long">
             <agm-info-window>
-                <h3><strong>{{alert.type}}</strong></h3>
-                <p>{{alert.id}}</p>
+                <h3><strong>{{alert.gender}}, {{alert.age}} years</strong></h3>
+                <p>{{alert.timestamp?.toDate() | date: 'MMM d, y, h:mm:ss a'}}</p>
             </agm-info-window>
         </agm-marker>
 
