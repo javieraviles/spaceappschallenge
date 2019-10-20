@@ -11,12 +11,13 @@
     </ion-button>
 
     <agm-map [latitude]="userCoords.latitude" [longitude]="userCoords.longitude" [zoom]="15"
-             (centerChange)="onCenterChange($event)"  [streetViewControl]="false">
+             (centerChange)="onCenterChange($event)" [streetViewControl]="false">
 
-        <!--        <agm-marker [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"></agm-marker>-->
+        <agm-marker *ngIf="!selfAlertId" [latitude]="userCoords.latitude" [longitude]="userCoords.longitude"
+                    iconUrl="../../assets/marks/self-mark-normal.png"></agm-marker>
 
         <agm-marker *ngFor="let alert of singleAlerts" [latitude]="alert.coords.geopoint._lat"
-                    [longitude]="alert.coords.geopoint._long">
+                    [longitude]="alert.coords.geopoint._long" [iconUrl]="getAlertIcon(alert)">
             <agm-info-window>
                 <h3><strong>{{alert.gender}}, {{alert.age}} years</strong></h3>
                 <p>{{alert.timestamp?.toDate() | date: 'MMM d, y, h:mm:ss a'}}</p>

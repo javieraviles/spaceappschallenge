@@ -85,6 +85,14 @@ export class MapComponent implements OnInit {
         this.selectedHazard = event.detail.value;
     }
 
+    getAlertIcon(alert: Alert) {
+        if (alert.id === this.selfAlertId) {
+            return '../../assets/marks/self-mark-alert.png';
+        } else {
+            return '../../assets/marks/other-mark-alert.png';
+        }
+    }
+
     getHazardColor(hazard: string) {
         switch (hazard) {
             case 'FIRE': {
