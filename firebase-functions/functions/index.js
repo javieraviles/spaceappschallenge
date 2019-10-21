@@ -13,7 +13,12 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onCreate((c
         //Calculate distances
         var alertUserId = newAlert._fieldsProto.userId.stringValue;
         var radius = newAlert._fieldsProto.radius.integerValue;
-        var hazard = newAlert._fieldsProto.hazard.stringValue;
+        var hazard;
+        if(newAlert._fieldsProto.hazard !== undefined){
+            hazard = newAlert._fieldsProto.hazard.stringValue;
+        }else{
+            hazard = "emergency";
+        }
         console.log("alertUserId: " + alertUserId);
         console.log("radius:" + radius);
         console.log("hazard" + hazard);
@@ -24,7 +29,11 @@ exports.useAlerts = functions.firestore.document('alerts/{alertId}').onCreate((c
                 var distance = calculateDistance(newAlertCoords, userCoords);
                 var userId = user.data().uid;
                 console.log("user " + user.data().displayName + " distance: " + distance);
-                if(distance < (radius / 1000) && userId !== alertUserId){
+                var affectedArea = 0.5;
+                if(hazard !== "emergency"){
+                    affectedArea = radius / 1000;
+                }
+                if(distance < affectedArea && userId !== alertUserId){
                     var notification = "There was a " + hazard + " at " + distance.toFixed(2) + "km from your current position";
                     usersCollection.doc(user.data().uid).update({notification : notification});
                 }
