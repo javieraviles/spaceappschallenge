@@ -8,5 +8,7 @@ namespace WeatherAPI.Model
         public string UserId { get; set; }
         public long Radius { get; set; }
         public string Type { get; set; }
+
+        
     }
 }

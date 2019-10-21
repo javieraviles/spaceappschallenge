@@ -1,6 +1,7 @@
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WeatherAPI.Model;
@@ -16,13 +17,13 @@ namespace WeatherAPI.Controllers
         public string ProjectName { get; set; } = "safety-network";
 
         [HttpGet("AllAlerts")]
-        public IActionResult GetAllAlerts()
+        public async Task<IActionResult> GetAllAlerts()
         {
             IEnumerable<Alert> alerts = RetrieveAlerts();
 
             foreach (Alert alert in alerts)
             {
-                //CreateNewAlert(alert, alert.Comment);
+                await CreateNewAlert(alert, alert.Comment);
             }
 
             return Ok(alerts);
@@ -62,6 +63,9 @@ namespace WeatherAPI.Controllers
                         case "type":
                             alert.Type = pair.Value as string;
                             break;
+                        case "hazard":
+                            alert.Comment = pair.Value as string;
+                            break;
                         default:
                             break;
                     }
@@ -77,27 +81,41 @@ namespace WeatherAPI.Controllers
         [HttpPost("FireAlert")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Alert> CreateFireAlert(Alert alert)
+        public async Task<ActionResult<Alert>> CreateFireAlert(Alert alert)
         {
-            return CreateNewAlert(alert, "Fuego!!!!");
+            return await CreateNewAlert(alert, "Fuego!!!!");
         }
 
         [HttpPost("FloodAlert")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Alert> CreateFloodAlert(Alert alert)
+        public async Task<ActionResult<Alert>> CreateFloodAlert(Alert alert)
         {
-            return CreateNewAlert(alert, "Inundacion!!!!");
+            return await CreateNewAlert(alert, "Inundacion!!!!");
         }
 
         [HttpPost("CreateAlert")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Alert> CreateNewAlert([FromBody]Alert alert, string message = "")
+        public async Task<ActionResult<Alert>> CreateNewAlert([FromBody]Alert alert, string message = "")
         {
             FirestoreDb db = FirestoreDb.Create(ProjectName);
-            DocumentReference cityRef = db.Collection("alerts").Document("SF");
-            // [START fs_add_subcollection]
+            // [START fs_retrieve_create_examples]
+            CollectionReference citiesRef = db.Collection("alerts");
+            await citiesRef.Document("AEMET" + DateTime.Now.ToLongTimeString().Replace(":", "")).SetAsync(new Dictionary<string, object>()
+            {
+                { "hazard", alert.Comment },
+                { "radius", alert.Radius },
+                { "type", alert.Type },
+                { "userId", alert.UserId },
+                { "coords", new Dictionary<string, object>()
+                    {
+                        { "geopoint", new GeoPoint(alert.Latitude, alert.Longitude) }
+                    }
+                }
+
+            });
+
             return Ok();
         }
 
