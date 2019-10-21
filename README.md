@@ -26,8 +26,8 @@ https://play.google.com/store/apps/details?id=com.safety.network&hl=en_US
 OUR APP IN THE WEB:
 https://safety-network.firebaseapp.com
 
-OUR CODE REPOSITORY:
-https://github.com/javieraviles/spaceappschallenge
+OUR PROFILE IN NASA SPACE APPS:
+https://2019.spaceappschallenge.org/challenges/living-our-world/curious-minds-come-helping-hands/teams/auto/project
 
 OUR PRESENTATION:
 https://github.com/javieraviles/spaceappschallenge/blob/master/Documentation/project_slide.pptx​
