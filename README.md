@@ -29,5 +29,8 @@ https://safety-network.firebaseapp.com
 OUR CODE REPOSITORY:
 https://github.com/javieraviles/spaceappschallenge
 
+OUR PRESENTATION:
+https://github.com/javieraviles/spaceappschallenge/blob/master/Documentation/project_slide.pptx​
+
 
 AUTO team.
