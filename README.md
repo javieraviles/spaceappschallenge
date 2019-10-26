@@ -1,6 +1,6 @@
 # Space Apps Challenge - SAFETY NETWORK
 
-Our web and mobile application is a collaborative safety network, locating people in danger in real time and tracking them so emergency services can rescue them.
+Our web and mobile application is a collaborative safety network, locating people in danger in real time and tracking them so emergency services can rescue them. [Video presentation](https://www.youtube.com/watch?v=jciM0nb98KQ)
 
 ![Alt text](./Documentation/cover.png?raw=true "Safety Network")
 
